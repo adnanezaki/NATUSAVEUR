@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install *)",
+      "Bash(curl -s http://localhost:3000 -o /dev/null -w \"home: %{http_code}\\\\n\" --max-time 15)",
+      "Bash(npm run *)"
+    ]
+  }
+}
