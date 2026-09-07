@@ -2,7 +2,7 @@
 
 import { useState, useEffect, type FormEvent } from "react";
 import Link from "next/link";
-import { Check } from "lucide-react";
+import { Check, MessageCircle } from "lucide-react";
 import { useCart } from "@/hooks/useCart";
 import { useHasMounted } from "@/hooks/useHasMounted";
 import { formatPrice, generateOrderId, cn } from "@/lib/utils";
@@ -17,6 +17,7 @@ export default function CheckoutPage() {
   const { items, subtotal, clearCart } = useCart();
   const [deliveryId, setDeliveryId] = useState(deliveryMethods[0].id);
   const [confirmedOrder, setConfirmedOrder] = useState<Order | null>(null);
+  const [whatsappRedirectUrl, setWhatsappRedirectUrl] = useState<string>("");
   const [submitting, setSubmitting] = useState(false);
 
   const delivery = deliveryMethods.find((d) => d.id === deliveryId) ?? deliveryMethods[0];
@@ -34,15 +35,25 @@ export default function CheckoutPage() {
     setSubmitting(true);
     const formData = new FormData(e.currentTarget);
 
+    const firstName = String(formData.get("firstName") ?? "").trim();
+    const lastName = String(formData.get("lastName") ?? "").trim();
+    const phone = String(formData.get("phone") ?? "").trim();
+    const email = String(formData.get("email") ?? "").trim() || undefined;
+    const address = String(formData.get("address") ?? "").trim();
+    const city = String(formData.get("city") ?? "").trim();
+    const neighborhood = String(formData.get("neighborhood") ?? "").trim();
+    const instructions = String(formData.get("instructions") ?? "").trim();
+
+    const orderId = generateOrderId();
     const order: Order = {
-      id: generateOrderId(),
+      id: orderId,
       customer: {
-        firstName: String(formData.get("firstName") ?? ""),
-        lastName: String(formData.get("lastName") ?? ""),
-        phone: String(formData.get("phone") ?? ""),
-        email: String(formData.get("email") ?? "") || undefined,
+        firstName,
+        lastName,
+        phone,
+        email,
       },
-      items,
+      items: [...items],
       subtotal: subtotal(),
       deliveryFee: delivery.price,
       total,
@@ -51,33 +62,94 @@ export default function CheckoutPage() {
       createdAt: new Date().toISOString(),
     };
 
+    // Construction du message WhatsApp complet et lisible
+    const itemsLines = items
+      .map(
+        (item) =>
+          `• ${item.name} (Qté : ${item.quantity}${item.weight ? `, ${item.weight}` : ""}) - ${item.price * item.quantity} DH`
+      )
+      .join("\n");
+
+    const fullAddress = [address, neighborhood, city].filter(Boolean).join(", ");
+
+    const whatsappMessage = `🛍️ *NOUVELLE COMMANDE SUR NATUSAVEUR* 🛍️
+Réf : #${order.id}
+-----------------------------------------
+👤 *INFORMATIONS CLIENT :*
+• Nom complet : ${firstName} ${lastName}
+• Téléphone : ${phone}
+• Adresse de livraison : ${fullAddress}
+• Ville : ${city}${instructions ? `\n• Notes : ${instructions}` : ""}${email ? `\n• Email : ${email}` : ""}
+
+📦 *DÉTAIL DE LA COMMANDE :*
+${itemsLines}
+
+🚚 *LIVRAISON :*
+• Mode : ${delivery.name} (${delivery.price > 0 ? `${delivery.price} DH` : "Gratuite"})
+
+💰 *TOTAL À PAYER À LA LIVRAISON :*
+* ${total} DH *
+=========================================`;
+
+    const whatsappUrl = `https://wa.me/212666082281?text=${encodeURIComponent(whatsappMessage)}`;
+    setWhatsappRedirectUrl(whatsappUrl);
+
+    // Traitement du paiement (COD) & Analytics
     await cashOnDeliveryProvider.createPayment(order);
     trackEvent("purchase", {
       orderId: order.id,
       value: order.total,
       itemCount: order.items.length,
     });
+
+    // Sauvegarde commande locale et vidage du panier
     setConfirmedOrder(order);
     clearCart();
+
+    // Redirection automatique vers WhatsApp
+    try {
+      window.location.href = whatsappUrl;
+    } catch {
+      window.open(whatsappUrl, "_blank");
+    }
+
     setSubmitting(false);
   }
 
   if (confirmedOrder) {
     return (
       <div className="mx-auto flex max-w-xl flex-col items-center px-6 pt-32 pb-24 text-center">
-        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-deep-green">
-          <Check className="h-6 w-6 text-ivory" strokeWidth={2} />
+        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-deep-green text-ivory shadow-lg shadow-deep-green/20">
+          <Check className="h-8 w-8 text-ivory" strokeWidth={2.5} />
         </div>
-        <h1 className="mt-6 font-display text-3xl text-charcoal">Commande confirmée</h1>
-        <p className="mt-3 font-body text-sm text-muted">
-          Merci {confirmedOrder.customer.firstName}, votre commande{" "}
-          <span className="text-charcoal">#{confirmedOrder.id}</span> a bien été enregistrée.
-          Vous serez contacté(e) au {confirmedOrder.customer.phone} pour confirmer la livraison.
+        <h1 className="mt-6 font-display text-3xl text-charcoal sm:text-4xl">Commande validée !</h1>
+        <p className="mt-3 font-body text-sm leading-relaxed text-muted max-w-md">
+          Merci <span className="font-semibold text-charcoal">{confirmedOrder.customer.firstName}</span>, votre commande{" "}
+          <span className="font-semibold text-charcoal">#{confirmedOrder.id}</span> a bien été générée.
         </p>
-        <p className="mt-6 font-display text-xl text-charcoal">
-          {formatPrice(confirmedOrder.total)}
-        </p>
-        <ButtonLink href="/" className="mt-8">
+
+        <div className="mt-6 w-full rounded-lg border border-charcoal/10 bg-sand/15 p-5 text-left font-body text-xs">
+          <div className="flex justify-between font-semibold text-charcoal text-sm mb-2">
+            <span>Réf : #{confirmedOrder.id}</span>
+            <span>{formatPrice(confirmedOrder.total)}</span>
+          </div>
+          <p className="text-muted">Client : {confirmedOrder.customer.firstName} {confirmedOrder.customer.lastName} ({confirmedOrder.customer.phone})</p>
+          <p className="text-muted mt-1">Paiement : Espèces à la livraison</p>
+        </div>
+
+        {whatsappRedirectUrl && (
+          <a
+            href={whatsappRedirectUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-6 flex w-full items-center justify-center gap-2 rounded-sm bg-[#25D366] px-6 py-4 font-body text-sm font-semibold uppercase tracking-[0.08em] text-[#0b1a10] shadow-md transition-all hover:bg-[#1fb856] hover:scale-[1.01]"
+          >
+            <MessageCircle className="h-5 w-5" strokeWidth={2} />
+            Ouvrir la commande sur WhatsApp
+          </a>
+        )}
+
+        <ButtonLink href="/" variant="outline" className="mt-4 w-full">
           Retour à l&apos;accueil
         </ButtonLink>
       </div>

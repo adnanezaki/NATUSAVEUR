@@ -1,8 +1,9 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { X } from "lucide-react";
+import { X, Phone, MessageCircle } from "lucide-react";
 import Link from "next/link";
+import { CONTACT_PHONE_DISPLAY, CONTACT_PHONE_TEL, getWhatsAppUrl } from "@/lib/contact";
 
 const LINKS = [
   { href: "/food", label: "Food" },
@@ -10,6 +11,7 @@ const LINKS = [
   { href: "/shop", label: "Shop" },
   { href: "/stories", label: "Stories" },
   { href: "/about", label: "About" },
+  { href: "/contact", label: "Contact" },
 ];
 
 const SECONDARY_LINKS = [
@@ -32,7 +34,7 @@ export function MobileMenu({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
-          className="fixed inset-0 z-[70] flex flex-col bg-deep-green text-ivory md:hidden"
+          className="fixed inset-0 z-[70] flex flex-col bg-deep-green text-ivory md:hidden overflow-y-auto"
           role="dialog"
           aria-modal="true"
           aria-label="Menu de navigation"
@@ -48,7 +50,7 @@ export function MobileMenu({
             </button>
           </div>
 
-          <nav className="flex flex-1 flex-col justify-center gap-2 px-6">
+          <nav className="flex flex-1 flex-col justify-center gap-2 px-6 py-4">
             {LINKS.map((link, i) => (
               <motion.div
                 key={link.href}
@@ -59,7 +61,7 @@ export function MobileMenu({
                 <Link
                   href={link.href}
                   onClick={onClose}
-                  className="block py-3 font-display text-4xl uppercase tracking-tight"
+                  className="block py-2.5 font-display text-3xl uppercase tracking-tight"
                 >
                   {link.label}
                 </Link>
@@ -67,13 +69,32 @@ export function MobileMenu({
             ))}
           </nav>
 
-          <div className="flex flex-wrap gap-x-6 gap-y-2 border-t border-ivory/15 px-6 py-8">
+          <div className="flex flex-col gap-3 border-t border-ivory/15 px-6 py-6 font-body text-xs text-ivory/80">
+            <a
+              href={`tel:${CONTACT_PHONE_TEL}`}
+              className="flex items-center gap-2.5 py-1 text-ivory hover:text-sand transition-colors"
+            >
+              <Phone className="h-4 w-4 text-sand" />
+              <span>Appeler : {CONTACT_PHONE_DISPLAY}</span>
+            </a>
+            <a
+              href={getWhatsAppUrl("Bonjour NATUSAVEUR, je souhaite commander.")}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2.5 py-1 text-[#25D366] hover:text-white transition-colors"
+            >
+              <MessageCircle className="h-4 w-4" />
+              <span>WhatsApp : {CONTACT_PHONE_DISPLAY}</span>
+            </a>
+          </div>
+
+          <div className="flex flex-wrap gap-x-6 gap-y-2 border-t border-ivory/15 px-6 py-5">
             {SECONDARY_LINKS.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 onClick={onClose}
-                className="font-body text-sm uppercase tracking-[0.1em] text-ivory/70 hover:text-ivory"
+                className="font-body text-xs uppercase tracking-[0.1em] text-ivory/70 hover:text-ivory"
               >
                 {link.label}
               </Link>

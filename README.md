@@ -32,7 +32,7 @@ Copy `.env.example` to `.env.local` and fill in the values you have:
 - `NEXT_PUBLIC_SITE_URL` — canonical site URL, used for metadata/sitemap.
 - `NEXT_PUBLIC_GA_ID`, `NEXT_PUBLIC_META_PIXEL_ID`, `NEXT_PUBLIC_TIKTOK_PIXEL_ID` —
   analytics IDs. Leave blank to keep tracking as a no-op (see `lib/analytics.ts`).
-- `NEXT_PUBLIC_WHATSAPP_NUMBER` — international format, digits only (e.g. `212600000000`).
+- `NEXT_PUBLIC_WHATSAPP_NUMBER` — international format, digits only (e.g. `212666082281`).
 
 None of these are required to run the app locally.
 
