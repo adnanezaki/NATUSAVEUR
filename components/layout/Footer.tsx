@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { InstagramIcon, FacebookIcon } from "@/components/ui/SocialIcons";
 import { NewsletterForm } from "@/components/sections/NewsletterForm";
+import { CONTACT_PHONE_DISPLAY, CONTACT_PHONE_TEL, getWhatsAppUrl } from "@/lib/contact";
 
-const COLUMNS: { title: string; links: { href: string; label: string }[] }[] = [
+const COLUMNS: { title: string; links: { href: string; label: string; isExternal?: boolean }[] }[] = [
   {
     title: "Shop",
     links: [
@@ -20,11 +21,12 @@ const COLUMNS: { title: string; links: { href: string; label: string }[] }[] = [
     ],
   },
   {
-    title: "Help",
+    title: "Help & Contact",
     links: [
       { href: "/contact", label: "Contact" },
-      { href: "/faq", label: "Livraison" },
-      { href: "/faq", label: "Retours" },
+      { href: `tel:${CONTACT_PHONE_TEL}`, label: `Appel : ${CONTACT_PHONE_DISPLAY}`, isExternal: true },
+      { href: getWhatsAppUrl("Bonjour NATUSAVEUR, j'ai une question."), label: "WhatsApp Direct", isExternal: true },
+      { href: "/faq", label: "Livraison & Retours" },
     ],
   },
   {
@@ -77,12 +79,23 @@ export function Footer() {
               <ul className="mt-4 flex flex-col gap-3">
                 {col.links.map((link, i) => (
                   <li key={col.title + link.label + i}>
-                    <Link
-                      href={link.href}
-                      className="link-underline font-body text-sm text-ivory/80"
-                    >
-                      {link.label}
-                    </Link>
+                    {link.isExternal ? (
+                      <a
+                        href={link.href}
+                        target={link.href.startsWith("http") ? "_blank" : undefined}
+                        rel={link.href.startsWith("http") ? "noopener noreferrer" : undefined}
+                        className="link-underline font-body text-sm text-ivory/80 hover:text-ivory transition-colors"
+                      >
+                        {link.label}
+                      </a>
+                    ) : (
+                      <Link
+                        href={link.href}
+                        className="link-underline font-body text-sm text-ivory/80 hover:text-ivory transition-colors"
+                      >
+                        {link.label}
+                      </Link>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -94,9 +107,27 @@ export function Footer() {
           <NewsletterForm dark />
         </div>
 
-        <div className="mt-12 flex flex-col gap-2 border-t border-ivory/10 pt-6 font-body text-xs text-ivory/40 md:flex-row md:items-center md:justify-between">
+        <div className="mt-12 flex flex-col gap-3 border-t border-ivory/10 pt-6 font-body text-xs text-ivory/50 md:flex-row md:items-center md:justify-between">
           <p>© {new Date().getFullYear()} NATUSAVEUR. Tous droits réservés.</p>
-          <p>Casablanca, Maroc</p>
+          <div className="flex flex-wrap items-center gap-4">
+            <a
+              href={`tel:${CONTACT_PHONE_TEL}`}
+              className="text-ivory/80 transition-colors hover:text-ivory"
+            >
+              📞 {CONTACT_PHONE_DISPLAY}
+            </a>
+            <span>•</span>
+            <a
+              href={getWhatsAppUrl("Bonjour NATUSAVEUR, j'ai une question.")}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-ivory/80 transition-colors hover:text-[#25D366]"
+            >
+              WhatsApp : {CONTACT_PHONE_DISPLAY}
+            </a>
+            <span>•</span>
+            <p>Casablanca, Maroc</p>
+          </div>
         </div>
       </div>
     </footer>

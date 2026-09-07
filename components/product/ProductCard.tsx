@@ -23,14 +23,14 @@ export function ProductCard({ product }: { product: Product }) {
           <div className="h-full w-full transition-transform duration-700 ease-out group-hover:scale-[1.04]">
             <ProductImage product={product} />
           </div>
-          {product.compareAtPrice && (
-            <span className="absolute left-3 top-3 bg-terracotta px-2.5 py-1 font-body text-[10px] uppercase tracking-wider text-ivory">
+          {product.compareAtPrice && !outOfStock && (
+            <span className="absolute left-3 top-3 bg-terracotta px-2.5 py-1 font-body text-[10px] uppercase tracking-wider text-ivory shadow-xs">
               Promo
             </span>
           )}
           {outOfStock && (
-            <span className="absolute left-3 top-3 bg-charcoal px-2.5 py-1 font-body text-[10px] uppercase tracking-wider text-ivory">
-              Rupture de stock
+            <span className="absolute left-3 top-3 bg-charcoal/90 backdrop-blur-xs px-2.5 py-1 font-body text-[10px] uppercase tracking-wider text-ivory shadow-xs border border-white/10">
+              Bientôt disponible
             </span>
           )}
         </div>
@@ -53,7 +53,7 @@ export function ProductCard({ product }: { product: Product }) {
         <div className="flex items-start justify-between gap-2">
           <div>
             <Link href={`/product/${product.slug}`}>
-              <h3 className="font-body text-sm text-charcoal transition-colors group-hover:text-deep-green">
+              <h3 className="font-body text-sm font-medium text-charcoal transition-colors group-hover:text-deep-green line-clamp-1">
                 {product.name}
               </h3>
             </Link>
@@ -70,13 +70,18 @@ export function ProductCard({ product }: { product: Product }) {
         </div>
 
         <div className="mt-3 flex items-center justify-between">
-          <p className="font-body text-sm text-charcoal">{formatPrice(product.price)}</p>
+          <p className="font-body text-sm font-semibold text-charcoal">{formatPrice(product.price)}</p>
           <button
             onClick={() => !outOfStock && addItem(product)}
             disabled={outOfStock}
-            className="font-body text-[11px] uppercase tracking-[0.1em] text-deep-green underline-offset-4 hover:underline disabled:text-muted disabled:no-underline"
+            className={cn(
+              "font-body text-[11px] uppercase tracking-[0.1em] transition-colors",
+              outOfStock
+                ? "text-muted/80 cursor-not-allowed"
+                : "text-deep-green font-medium underline-offset-4 hover:underline"
+            )}
           >
-            {outOfStock ? "Indisponible" : "Ajouter"}
+            {outOfStock ? "Bientôt disponible" : "Ajouter"}
           </button>
         </div>
       </div>

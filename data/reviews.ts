@@ -7,15 +7,15 @@ export const reviews: Review[] = [
     productId: "f-01",
     author: "Aïcha K.",
     rating: 5,
-    comment: "Enfin de l'attiéké facilement accessible au Maroc. Texture parfaite.",
+    comment: "L'Attiéké Choco de Nourivoire est exceptionnel ! Grain très fin, léger et parfum authentique. Enfin disponible facilement au Maroc.",
     date: "2026-06-10",
   },
   {
     id: "r-02",
     productId: "f-01",
     author: "Junior D.",
-    rating: 4,
-    comment: "Très bon produit, la livraison a été rapide.",
+    rating: 5,
+    comment: "Format 1 kg très généreux et qualité premium incomparable. Livraison rapide à Casablanca !",
     date: "2026-05-22",
   },
   {

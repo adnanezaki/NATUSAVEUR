@@ -15,7 +15,7 @@ export const stories: Story[] = [
       "Pour le préparer, il suffit de réhydrater la semoule à la vapeur pendant 5 à 10 minutes, en l'égrainant à la fourchette à mi-cuisson pour éviter les grumeaux.",
       "Servez chaud, avec une sauce tomate relevée, du piment et des oignons frais pour retrouver le goût de chez vous.",
     ],
-    relatedProductSlugs: ["attieke-de-manioc", "alloco-decoupe-surgele"],
+    relatedProductSlugs: ["attieke-choco", "alloco-decoupe-surgele"],
   },
   {
     id: "s-02",
@@ -31,7 +31,7 @@ export const stories: Story[] = [
       "L'attiéké se présente sous forme de semoule légère et aérée, tandis que le placali forme une pâte homogène et souple, plus proche du foutou.",
       "Le choix entre les deux dépend souvent de la région d'origine et du plat que l'on souhaite accompagner.",
     ],
-    relatedProductSlugs: ["attieke-de-manioc", "placali"],
+    relatedProductSlugs: ["attieke-choco", "placali"],
   },
   {
     id: "s-03",

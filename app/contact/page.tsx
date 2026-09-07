@@ -5,9 +5,7 @@ import { Mail, Phone, MessageCircle } from "lucide-react";
 import { InstagramIcon, FacebookIcon } from "@/components/ui/SocialIcons";
 import { Reveal } from "@/components/animations/Reveal";
 import { Button } from "@/components/ui/Button";
-
-const WHATSAPP_NUMBER =
-  process.env.NEXT_PUBLIC_WHATSAPP_NUMBER?.replace(/\D/g, "") || "212600000000";
+import { CONTACT_PHONE_DISPLAY, CONTACT_PHONE_TEL, CONTACT_EMAIL, getWhatsAppUrl } from "@/lib/contact";
 
 export default function ContactPage() {
   const [submitted, setSubmitted] = useState(false);
@@ -30,27 +28,27 @@ export default function ContactPage() {
         <Reveal delay={0.05}>
           <div className="flex flex-col gap-6">
             <a
-              href={`https://wa.me/${WHATSAPP_NUMBER}`}
+              href={getWhatsAppUrl("Bonjour NATUSAVEUR, je souhaite avoir des renseignements.")}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-3 font-body text-sm text-charcoal hover:text-deep-green"
+              className="flex items-center gap-3 font-body text-sm text-charcoal hover:text-deep-green transition-colors"
             >
-              <MessageCircle className="h-4 w-4" strokeWidth={1.5} />
-              WhatsApp
+              <MessageCircle className="h-4 w-4 text-[#25D366]" strokeWidth={1.75} />
+              <span>WhatsApp ({CONTACT_PHONE_DISPLAY})</span>
             </a>
             <a
-              href="tel:+212600000000"
-              className="flex items-center gap-3 font-body text-sm text-charcoal hover:text-deep-green"
+              href={`tel:${CONTACT_PHONE_TEL}`}
+              className="flex items-center gap-3 font-body text-sm text-charcoal hover:text-deep-green transition-colors"
             >
               <Phone className="h-4 w-4" strokeWidth={1.5} />
-              +212 6 00 00 00 00
+              <span>{CONTACT_PHONE_DISPLAY}</span>
             </a>
             <a
-              href="mailto:contact@natusaveur.com"
-              className="flex items-center gap-3 font-body text-sm text-charcoal hover:text-deep-green"
+              href={`mailto:${CONTACT_EMAIL}`}
+              className="flex items-center gap-3 font-body text-sm text-charcoal hover:text-deep-green transition-colors"
             >
               <Mail className="h-4 w-4" strokeWidth={1.5} />
-              contact@natusaveur.com
+              <span>{CONTACT_EMAIL}</span>
             </a>
             <div className="mt-4 flex gap-3">
               <a

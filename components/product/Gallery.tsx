@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { X, ZoomIn, ChevronLeft, ChevronRight } from "lucide-react";
 import type { Product } from "@/data/types";
@@ -19,28 +19,71 @@ export function Gallery({ product }: { product: Product }) {
     setActive((a) => (a - 1 + images.length) % images.length);
   }
 
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (!fullscreen) return;
+      if (e.key === "ArrowRight") next();
+      if (e.key === "ArrowLeft") prev();
+      if (e.key === "Escape") setFullscreen(false);
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [fullscreen, images.length]);
+
   return (
-    <div>
-      <button
-        onClick={() => setFullscreen(true)}
-        className="group relative block aspect-square w-full overflow-hidden bg-sand/20"
-        aria-label="Agrandir l'image"
-      >
-        <ProductImage product={product} index={active} showLabel={false} />
-        <span className="absolute bottom-3 right-3 flex h-9 w-9 items-center justify-center rounded-full bg-ivory/90 opacity-0 transition-opacity group-hover:opacity-100">
-          <ZoomIn className="h-4 w-4 text-charcoal" strokeWidth={1.5} />
-        </span>
-      </button>
+    <div className="flex flex-col">
+      <div className="relative aspect-square w-full overflow-hidden bg-sand/20 border border-charcoal/10 rounded-sm">
+        <button
+          onClick={() => setFullscreen(true)}
+          className="group relative block h-full w-full overflow-hidden"
+          aria-label="Agrandir l'image"
+        >
+          <ProductImage product={product} index={active} showLabel={false} />
+          <span className="absolute bottom-3 right-3 flex h-9 w-9 items-center justify-center rounded-full bg-ivory/90 text-charcoal opacity-0 shadow-sm transition-opacity group-hover:opacity-100">
+            <ZoomIn className="h-4 w-4" strokeWidth={1.5} />
+          </span>
+        </button>
+
+        {images.length > 1 && (
+          <>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                prev();
+              }}
+              aria-label="Image précédente"
+              className="absolute left-3 top-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-ivory/80 text-charcoal backdrop-blur-xs transition-all hover:bg-ivory hover:scale-105 shadow-xs"
+            >
+              <ChevronLeft className="h-4 w-4" strokeWidth={2} />
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                next();
+              }}
+              aria-label="Image suivante"
+              className="absolute right-3 top-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-ivory/80 text-charcoal backdrop-blur-xs transition-all hover:bg-ivory hover:scale-105 shadow-xs"
+            >
+              <ChevronRight className="h-4 w-4" strokeWidth={2} />
+            </button>
+            <div className="absolute top-3 right-3 rounded-full bg-charcoal/70 px-2.5 py-0.5 font-body text-[11px] text-ivory backdrop-blur-xs">
+              {active + 1} / {images.length}
+            </div>
+          </>
+        )}
+      </div>
 
       {images.length > 1 && (
-        <div className="mt-4 grid grid-cols-4 gap-3">
-          {images.map((_, i) => (
+        <div className="mt-3 grid grid-cols-4 sm:grid-cols-6 gap-2">
+          {images.map((imgSrc, i) => (
             <button
               key={i}
               onClick={() => setActive(i)}
               className={cn(
-                "aspect-square overflow-hidden border transition-colors",
-                active === i ? "border-charcoal" : "border-transparent"
+                "relative aspect-square overflow-hidden border-2 transition-all rounded-xs bg-sand/15",
+                active === i
+                  ? "border-deep-green ring-1 ring-deep-green"
+                  : "border-charcoal/10 opacity-70 hover:opacity-100"
               )}
               aria-label={`Voir l'image ${i + 1}`}
             >
@@ -86,7 +129,7 @@ export function Gallery({ product }: { product: Product }) {
                 </button>
               </>
             )}
-            <div className="aspect-square w-full max-w-xl overflow-hidden">
+            <div className="aspect-square w-full max-w-xl overflow-hidden rounded-sm bg-sand/20">
               <ProductImage product={product} index={active} showLabel={false} />
             </div>
           </motion.div>
@@ -95,3 +138,4 @@ export function Gallery({ product }: { product: Product }) {
     </div>
   );
 }
+
